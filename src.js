@@ -143,8 +143,62 @@ function closeModal() {
     load()
 }
 
+function validateFields() {
+    const fieldsToValidate = {
+        eventTitle: eventTitleInput.value,
+        startTime: startTime.value,
+        endTime: endTime.value
+    };
+
+    const errors = [];
+
+    eventTitleInput.classList.remove('error');
+    startTime.classList.remove('error');
+    endTime.classList.remove('error');
+
+    let errorText = '';
+
+    Object.entries(fieldsToValidate).forEach(([key, value]) => {
+        if (key === "startTime" && endTime && value > fieldsToValidate.endTime) {
+            errorText = 'Start time should be before end time!';
+            errors.push(key);
+            return;
+        }
+        if (key === "endTime" && startTime && value < fieldsToValidate.startTime) {
+            errorText = 'End time should be after start time!';
+            errors.push(key);
+            return;
+        }
+        if (!value) {
+            errors.push(key);
+        }
+    });
+
+    if (errors.length && !errorText) {
+        errorText = 'All fields must be filled!';
+    }
+
+    errors.forEach(fieldKey => {
+        if (fieldKey === 'eventTitle') {
+            eventTitleInput.classList.add('error');
+        }
+        if (fieldKey === 'startTime') {
+            startTime.classList.add('error');
+        }
+        if (fieldKey === 'endTime') {
+            endTime.classList.add('error');
+        }
+    });
+
+    if (errorText) {
+        alert(errorText);
+    }
+
+    return !errors.length;
+}
+
 function saveEvent () {
-    if (eventTitleInput.value) {
+    if (validateFields()) {
         events.push({
             date: clickedDay,
             title: eventTitleInput.value,
@@ -156,8 +210,6 @@ function saveEvent () {
 
         sessionStorage.setItem('events', JSON.stringify(events));
         closeModal();
-    } else {
-        console.log('event not saved');
     }
 }
 
