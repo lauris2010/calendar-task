@@ -29,6 +29,21 @@
         <div id="newEventModal">
             <h4>New Event</h4>
             <input id="eventTitleInput" placeholder="Event Title">
+            <h4>Description</h4>
+            <textarea name="description" id="descriptionTitleArea"  rows="3" ></textarea>
+            <div class="dropdown">
+                <h4>Type</h4>
+                <select id="selectType">
+                    <option value="call">Call</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="outOfOffice">Out of office</option>
+                </select>
+            </div>
+            <h4>Start time</h4>
+            <input type="time" id="startTimeInput">
+            <h4>End time</h4>
+            <input type="time" id="endTimeInput">
+            <br/>
             <button id="saveButton">Save</button>
             <button id="cancelButton">Cancel</button>
         </div>
@@ -36,6 +51,16 @@
             <h2>Event Preview</h2>
             <h4>Event Title</h4>
             <p id="eventText"></p>
+            <h4>description</h4>
+            <p id="descriptionAreaText"></p>
+            <h4>Type</h4>
+            <p id="typeText"></p>
+            <h4>Start Time</h4>
+            <p id="startTimeText"></p>
+            <h4>End Time</h4>
+            <p id="endTimeText"></p>
+            <h4>Date</h4>
+            <p id="dateText"></p>
             <button id="deleteButton">Delete</button>
             <button id="closeButton">Close</button>
         </div>

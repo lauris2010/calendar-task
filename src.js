@@ -8,11 +8,23 @@ const newEventModal = document.getElementById('newEventModal');
 const deleteEventModal = document.getElementById('deleteEventModal');
 const backDrop = document.getElementById('modalBackDrop');
 const eventTitleInput = document.getElementById('eventTitleInput');
+const descriptionTitleInput = document.getElementById('descriptionTitleArea');
+const startTime = document.getElementById('startTimeInput');
+const selectType = document.getElementById('selectType');
+const endTime = document.getElementById('endTimeInput');
+const markDay = document.getElementsByClassName('day');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-function openModal(date, eventForDay) {
+const typeMap = {
+    call: 'Call',
+    meeting: 'Meeting',
+    outOfOffice: 'Out of office'
+};
+
+function openModal(e, date, eventForDay) {
+    e.stopPropagation();
     clickedDay = date;
-    
+
     backDrop.style = 'block';
 
     if (!eventForDay) {
@@ -21,8 +33,27 @@ function openModal(date, eventForDay) {
     }
 
     clickedEvent = eventForDay;
+
     document.getElementById('eventText').innerText = eventForDay.title;
+    document.getElementById('descriptionAreaText').innerText = eventForDay.description;
+    document.getElementById('startTimeText').innerText = eventForDay.start;
+    document.getElementById('endTimeText').innerText = eventForDay.end;
+    document.getElementById('typeText').innerText = typeMap[eventForDay.type];
+    document.getElementById('dateText').innerText = eventForDay.date;
+
     deleteEventModal.style.display = 'block';
+}
+
+function handleDaySquareClick(e, daySquare) {
+    clearModal();
+
+    const days = document.getElementsByClassName('day');
+
+    Array.from(days).forEach(day => {
+        day.classList.remove('active');
+    });
+
+    daySquare.classList.add('active');
 }
 
 function displayEvents(dayString, daySquare) {
@@ -36,8 +67,9 @@ function displayEvents(dayString, daySquare) {
         const eventDiv = document.createElement('div');
 
         eventDiv.classList.add('event');
+        eventDiv.classList.add(eventForDay.type)
         eventDiv.innerText = eventForDay.title;
-        eventDiv.addEventListener('click', (e) => openModal(dayString, eventForDay));
+        eventDiv.addEventListener('click', (e) => openModal(e, dayString, eventForDay));
 
         daySquare.appendChild(eventDiv);
     });
@@ -72,7 +104,7 @@ function load() {
         const dayString = `${month + 1}/${i - paddingDays}/${year}`
         const daySquare = document.createElement('div');
         daySquare.classList.add('day');
-        
+        daySquare.addEventListener('click', (e) => handleDaySquareClick(e, daySquare))
 
         if (i <= paddingDays) {
             daySquare.classList.add('padding');
@@ -86,7 +118,7 @@ function load() {
             daySquare.id = 'currentDay';
         }
 
-        daySquare.addEventListener('click', () => openModal(dayString));
+        daySquare.addEventListener('click', (e) => openModal(e, dayString));
         displayEvents(dayString, daySquare);
 
         calendar.appendChild(daySquare);
@@ -94,10 +126,15 @@ function load() {
 }
 
 function clearModal() {
+    eventTitleInput.classList.remove('error')
     newEventModal.style.display = 'none';
     backDrop.style.display = 'none'
     eventTitleInput.value= '';
+    descriptionTitleInput.value = ''
     deleteEventModal.style.display = 'none'
+    startTime.value = ''
+    endTime.value = ''
+    selectType.value = 'call'
     clickedDay = null
 }
 
@@ -111,6 +148,10 @@ function saveEvent () {
         events.push({
             date: clickedDay,
             title: eventTitleInput.value,
+            description: descriptionTitleInput.value,
+            type: selectType.value,
+            start: startTime.value,
+            end: endTime.value,
         });
 
         sessionStorage.setItem('events', JSON.stringify(events));
@@ -121,7 +162,7 @@ function saveEvent () {
 }
 
 function deleteEvent() {
-    events = events.filter(e => !(e.title === clickedEvent.title))
+    events = events.filter(e => !(e.start === clickedEvent.start && e.end === clickedEvent.end))
 
     if (window.confirm("Are you sure you want to delete this event?")) {
         sessionStorage.setItem('events', JSON.stringify(events));
